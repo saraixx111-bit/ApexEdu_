@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-900 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApexEdu - Plataforma Educativa Integral</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                        },
+                        accent: {
+                            400: '#a855f7',
+                            500: '#9333ea',
+                            600: '#7e22ce',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Alpine.js CDN -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-[#e0e7ff]ans-serif; }
+        [x-cloak] { display: none !important; }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="h-full flex flex-col min-h-screen bg-slate-950 text-slate-100 selection:bg-brand-500 selection:text-white" x-data="apexEduApp()" x-init="initApp()">
+
+    <!-- Header & Navigation -->
+    <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 sm:h-20">
+                <!-- Logo & Branding -->
+                <div class="flex items-center space-x-3 cursor-pointer" @click="activeTab = 'simulator'">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-accent-500 to-indigo-400 flex items-center justify-center shadow-lg shadow-brand-500/30">
+                        <i class="fa-solid fa-graduation-cap text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-brand-500">ApexEdu</span>
+                        <span class="hidden md:inline-block text-xs text-brand-500 font-semibold uppercase tracking-wider ml-2 px-2 py-0.5 bg-brand-500/10 rounded-full border border-brand-500/20">Plataforma Digital</span>
+                    </div>
+                </div>
+
+                <!-- Navigation Desktop Tabs -->
+                <nav class="hidden md:flex space-x-1 lg:space-x-2">
+                    <button @click="activeTab = 'simulator'"
+                            :class="activeTab === 'simulator' ? 'bg-brand-600/20 text-brand-500 border-brand-500/50 shadow-lg shadow-brand-600/10' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
+                            class="px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 border flex items-center space-x-2">
+                        <i class="fa-solid fa-vial"></i>
+                        <span>Simulador de Exámenes</span>
+                    </button>
+                    <button @click="activeTab = 'repository'"
+                            :class="activeTab === 'repository' ? 'bg-brand-600/20 text-brand-500 border-brand-500/50 shadow-lg shadow-brand-600/10' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
+                            class="px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 border flex items-center space-x-2">
+                        <i class="fa-solid fa-book-open"></i>
+                        <span>Guías de Estudio</span>
+                    </button>
+                    <button @click="activeTab = 'planner'"
+                            :class="activeTab === 'planner' ? 'bg-brand-600/20 text-brand-500 border-brand-500/50 shadow-lg shadow-brand-600/10' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border-transparent'"
+                            class="px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 border flex items-center space-x-2">
+                        <i class="fa-solid fa-list-check"></i>
+                        <span>Planificador de Tareas</span>
+                    </button>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">
+                        <i class="fa-solid" :class="mobileMenuOpen ? 'fa-xmark text-xl' : 'fa-bars text-xl'"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div x-show="mobileMenuOpen" x-cloak x-transition class="md:hidden border-b border-slate-800 bg-slate-900/95 px-4 pt-2 pb-4 space-y-2">
+            <button @click="activeTab = 'simulator'; mobileMenuOpen = false"
+                    :class="activeTab === 'simulator' ? 'bg-brand-600 text-white' : 'text-slate-300 hover:bg-slate-800'"
+                    class="w-full text-left px-4 py-3 rounded-lg font-medium text-base flex items-center space-x-3">
+                <i class="fa-solid fa-vial w-5"></i>
+                <span>Simulador de Exámenes</span>
+            </button>
+            <button @click="activeTab = 'repository'; mobileMenuOpen = false"
+                    :class="activeTab === 'repository' ? 'bg-brand-600 text-white' : 'text-slate-300 hover:bg-slate-800'"
+                    class="w-full text-left px-4 py-3 rounded-lg font-medium text-base flex items-center space-x-3">
+                <i class="fa-solid fa-book-open w-5"></i>
+                <span>Guías de Estudio</span>
+            </button>
+            <button @click="activeTab = 'planner'; mobileMenuOpen = false"
+                    :class="activeTab === 'planner' ? 'bg-brand-600 text-white' : 'text-slate-300 hover:bg-slate-800'"
+                    class="w-full text-left px-4 py-3 rounded-lg font-medium text-base flex items-center space-x-3">
+                <i class="fa-solid fa-list-check w-5"></i>
+                <span>Planificador de Tareas</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Sub-header Hero / Tagline -->
+    <section class="bg-gradient-to-b from-slate-900 to-slate-950 border-b border-slate-800/80 py-6 px-4">
+        <div class="max-w-7xl mx-auto text-center">
+            <p class="text-sm sm:text-base md:text-lg text-slate-300 max-w-4xl mx-auto font-light leading-relaxed">
+                "<span class="font-semibold text-brand-500">ApexEdu</span> es una plataforma digital integral diseñada para potenciar el rendimiento escolar, centralizando herramientas interactivas de evaluación, recursos de estudio y organización académica para alcanzar el éxito institucional."
+            </p>
+        </div>
+    </section>
+
+    <!-- Main Dynamic Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- ================= MÓDULO 1: SIMULADOR DE CUESTIONARIOS ================= -->
+        <section x-show="activeTab === 'simulator'" x-cloak>
+            
+            <!-- Setup State -->
+            <template x-if="quizState === 'setup'">
+                <div class="max-w-3xl mx-auto space-y-8 bg-slate-900 border border-slate-800 p-6 sm:p-10 rounded-2xl shadow-xl">
+                    <div class="text-center space-y-2">
+                        <div class="inline-flex p-3 bg-brand-500/10 rounded-2xl border border-brand-500/20 text-brand-500 mb-2">
+                            <i class="fa-solid fa-sliders text-2xl"></i>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-white">Configuración del Cuestionario</h2>
+                        <p class="text-slate-400 text-sm">Selecciona la materia y modalidad de evaluación para iniciar.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Asignaturas -->
+                        <div class="space-y-3">
+                            <label class="block text-sm font-semibold text-slate-300">
+                                <i class="fa-solid fa-book text-brand-500 mr-2"></i>Asignatura:
+                            </label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <template x-for="subj in subjects" :key="subj.id">
+                                    <button @click="quizConfig.subject = subj.id"
+                                            :class="quizConfig.subject === subj.id ? 'bg-brand-600 text-white border-brand-500 shadow-md shadow-brand-600/30' : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-800'"
+                                            class="p-3.5 rounded-xl border text-sm font-medium flex flex-col items-center justify-center space-y-2 transition-all">
+                                        <i :class="subj.icon" class="text-xl"></i>
+                                        <span x-text="subj.name"></span>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Modo de Cuestionario -->
+                        <div class="space-y-3">
+                            <label class="block text-sm font-semibold text-slate-300">
+                                <i class="fa-solid fa-laptop-code text-brand-500 mr-2"></i>Modo de Evaluación:
+                            </label>
+                            <div class="space-y-3">
+                                <label @click="quizConfig.mode = 'practice'"
+                                       :class="quizConfig.mode === 'practice' ? 'border-brand-500 bg-brand-500/10' : 'border-slate-800 bg-slate-800/40 hover:bg-slate-800'"
+                                       class="flex items-start p-3.5 border rounded-xl cursor-pointer transition-all">
+                                    <input type="radio" name="mode" value="practice" x-model="quizConfig.mode" class="mt-1 text-brand-600 focus:ring-brand-500">
+                                    <div class="ml-3">
+                                        <div class="text-sm font-semibold text-white">Modo Práctica</div>
+                                        <div class="text-xs text-slate-400">Retroalimentación inmediata al responder cada pregunta. Sin límite estricto.</div>
+                                    </div>
+                                </label>
+
+                                <label @click="quizConfig.mode = 'exam'"
+                                       :class="quizConfig.mode === 'exam' ? 'border-brand-500 bg-brand-500/10' : 'border-slate-800 bg-slate-800/40 hover:bg-slate-800'"
+                                       class="flex items-start p-3.5 border rounded-xl cursor-pointer transition-all">
+                                    <input type="radio" name="mode" value="exam" x-model="quizConfig.mode" class="mt-1 text-brand-600 focus:ring-brand-500">
+                                    <div class="ml-3">
+                                        <div class="text-sm font-semibold text-white">Modo Examen</div>
+                                        <div class="text-xs text-slate-400">Con temporizador activo. Resultados y desglose al finalizar.</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Configuración de Tiempo (Modo Examen) -->
+                    <div x-show="quizConfig.mode === 'exam'" x-transition class="space-y-3 pt-2 border-t border-slate-800">
+                        <label class="block text-sm font-semibold text-slate-300">
+                            <i class="fa-solid fa-stopwatch text-brand-500 mr-2"></i>Tiempo Límite:
+                        </label>
+                        <div class="flex space-x-4">
+                            <button @click="quizConfig.timerMinutes = 10"
+                                    :class="quizConfig.timerMinutes === 10 ? 'bg-brand-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'"
+                                    class="flex-1 py-2.5 rounded-lg border border-slate-700 font-medium text-sm transition-all">
+                                10 Minutos
+                            </button>
+                            <button @click="quizConfig.timerMinutes = 15"
+                                    :class="quizConfig.timerMinutes === 15 ? 'bg-brand-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'"
+                                    class="flex-1 py-2.5 rounded-lg border border-slate-700 font-medium text-sm transition-all">
+                                15 Minutos
+                            </button>
+                        </div>
+                    </div>
+
+                    <button @click="startQuiz()"
+                            class="w-full py-4 bg-gradient-to-r from-brand-600 to-accent-600 hover:from-brand-500 hover:to-accent-500 text-white font-bold rounded-xl shadow-lg shadow-brand-600/25 transition-all text-base flex items-center justify-center space-x-2">
+                        <span>Comenzar Evaluación</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </template>
+
+            <!-- Quiz In-Progress State -->
+            <template x-if="quizState === 'active'">
+                <div class="max-w-3xl mx-auto space-y-6">
+                    <!-- Progress & Bar Header -->
+                    <div class="bg-slate-900 border border-slate-800 p-4 sm:p-6 rounded-2xl shadow-md flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <span class="text-xs font-semibold uppercase tracking-wider text-brand-500" x-text="getSubjectName(quizConfig.subject)"></span>
+                            <h3 class="text-lg font-bold text-white">Pregunta <span x-text="currentQuestionIndex + 1"></span> de <span x-text="activeQuestions.length"></span></h3>
+                        </div>
+
+                        <!-- Timer component (Exam mode) -->
+                        <div x-show="quizConfig.mode === 'exam'" class="flex items-center space-x-2 px-3.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700">
+                            <i class="fa-solid fa-clock text-amber-400 animate-pulse"></i>
+                            <span class="font-mono text-base font-bold text-amber-400" x-text="formattedTimeLeft"></span>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                            <div class="bg-gradient-to-r from-brand-500 to-accent-500 h-full transition-all duration-300"
+                                 :style="`width: ${((currentQuestionIndex + 1) / activeQuestions.length) * 100}%`"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question Card -->
+                    <div class="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-2xl shadow-xl space-y-6">
+                        <p class="text-lg sm:text-xl font-medium text-slate-100 leading-relaxed" x-text="currentQuestion.text"></p>
+
+                        <!-- Options -->
+                        <div class="space-y-3">
+                            <template x-for="(option, idx) in currentQuestion.options" :key="idx">
+                                <button @click="selectOption(idx)"
+                                        :disabled="quizConfig.mode === 'practice' && userAnswers[currentQuestionIndex] !== undefined"
+                                        :class="getOptionClass(idx)"
+                                        class="w-full text-left p-4 rounded-xl border transition-all flex items-start space-x-3 text-sm sm:text-base">
+                                    <span class="flex-shrink-0 w-6 h-6 rounded-full border border-slate-600 flex items-center justify-center font-bold text-xs mt-0.5"
+                                          :class="userAnswers[currentQuestionIndex] === idx ? 'bg-white text-slate-900 border-white' : 'text-slate-400'">
+                                        <span x-text="String.fromCharCode(65 + idx)"></span>
+                                    </span>
+                                    <span class="flex-grow" x-text="option"></span>
+                                    
+                                    <!-- Practice mode immediate icon indicator -->
+                                    <template x-if="quizConfig.mode === 'practice' && userAnswers[currentQuestionIndex] !== undefined">
+                                        <div>
+                                            <i x-show="idx === currentQuestion.correct" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+                                            <i x-show="userAnswers[currentQuestionIndex] === idx && idx !== currentQuestion.correct" class="fa-solid fa-circle-xmark text-rose-400 text-lg"></i>
+                                        </div>
+                                    </template>
+                                </button>
+                            </template>
+                        </div>
+
+                        <!-- Immediate Explanation for Practice Mode -->
+                        <div x-show="quizConfig.mode === 'practice' && userAnswers[currentQuestionIndex] !== undefined" x-transition
+                             class="p-4 rounded-xl border bg-slate-800/80 border-slate-700 text-sm space-y-1">
+                            <div class="font-bold text-brand-400 flex items-center space-x-2">
+                                <i class="fa-solid fa-lightbulb"></i>
+                                <span>Retroalimentación:</span>
+                            </div>
+                            <p class="text-slate-300" x-text="currentQuestion.explanation"></p>
+                        </div>
+
+                        <!-- Navigation controls -->
+                        <div class="flex justify-between items-center pt-4 border-t border-slate-800">
+                            <button @click="prevQuestion()" :disabled="currentQuestionIndex === 0"
+                                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg font-medium text-sm text-slate-300 transition-all flex items-center space-x-2">
+                                <i class="fa-solid fa-chevron-left"></i>
+                                <span>Anterior</span>
+                            </button>
+
+                            <template x-if="currentQuestionIndex < activeQuestions.length - 1">
+                                <button @click="nextQuestion()"
+                                        class="px-5 py-2.5 bg-brand-600 hover:bg-brand-500 text-white rounded-lg font-medium text-sm transition-all flex items-center space-x-2">
+                                    <span>Siguiente</span>
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                </button>
+                            </template>
+
+                            <template x-if="currentQuestionIndex === activeQuestions.length - 1">
+                                <button @click="finishQuiz()"
+                                        class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-sm shadow-md transition-all flex items-center space-x-2">
+                                    <i class="fa-solid fa-check"></i>
+                                    <span>Finalizar y Evaluar</span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Quiz Results Summary State -->
+            <template x-if="quizState === 'results'">
+                <div class="max-w-3xl mx-auto space-y-8">
+                    <!-- Results Header Card -->
+                    <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl shadow-xl text-center space-y-6">
+                        <div class="inline-flex p-4 rounded-full bg-slate-800 border border-slate-700">
+                            <i class="fa-solid" :class="calculatedScore >= 7 ? 'fa-trophy text-amber-400 text-4xl' : 'fa-graduation-cap text-brand-400 text-4xl'"></i>
+                        </div>
+
+                        <div>
+                            <h2 class="text-3xl font-extrabold text-white">Resultados del Examen</h2>
+                            <p class="text-slate-400 text-sm mt-1" x-text="`Asignatura: ${getSubjectName(quizConfig.subject)}`"></p>
+                        </div>
+
+                        <!-- Big Grade Banner -->
+                        <div class="py-6 px-8 bg-slate-800/50 rounded-2xl border border-slate-800 inline-block">
+                            <div class="text-xs uppercase tracking-wider font-semibold text-slate-400 mb-1">Calificación Final</div>
+                            <div class="text-5xl font-black"
+                                 :class="calculatedScore >= 7 ? 'text-emerald-400' : (calculatedScore >= 4 ? 'text-amber-400' : 'text-rose-500')"
+                                 x-text="`${calculatedScore.toFixed(1)} / 10`"></div>
+                        </div>
+
+                        <!-- Stats Grid -->
+                        <div class="grid grid-cols-3 gap-4 max-w-md mx-auto pt-2">
+                            <div class="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700/60">
+                                <div class="text-xs text-slate-400">Aciertos</div>
+                                <div class="text-xl font-bold text-emerald-400" x-text="correctCount"></div>
+                            </div>
+                            <div class="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700/60">
+                                <div class="text-xs text-slate-400">Errores</div>
+                                <div class="text-xl font-bold text-rose-400" x-text="incorrectCount"></div>
+                            </div>
+                            <div class="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700/60">
+                                <div class="text-xs text-slate-400">Efectividad</div>
+                                <div class="text-xl font-bold text-brand-400" x-text="`${Math.round((correctCount / activeQuestions.length) * 100)}%`"></div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-center space-x-4 pt-4">
+                            <button @click="resetQuiz()" class="px-6 py-3 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl transition-all shadow-md">
+                                <i class="fa-solid fa-rotate-right mr-2"></i>Realizar otro Intento
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Answer Review -->
+                    <div class="bg-slate-900 border border-slate-800 p-6 sm:p-8 rounded-2xl shadow-xl space-y-6">
+                        <h3 class="text-xl font-bold text-white border-b border-slate-800 pb-3">Revisión Detallada de Preguntas</h3>
+
+                        <div class="space-y-6">
+                            <template x-for="(q, idx) in activeQuestions" :key="idx">
+                                <div class="p-5 rounded-xl border bg-slate-950/60"
+                                     :class="userAnswers[idx] === q.correct ? 'border-emerald-500/30' : 'border-rose-500/30'">
+                                    
+                                    <div class="flex items-start justify-between gap-2 mb-3">
+                                        <div class="font-semibold text-slate-200">
+                                            <span class="text-brand-400 mr-1" x-text="`${idx + 1}.`"></span>
+                                            <span x-text="q.text"></span>
+                                        </div>
+                                        <span :class="userAnswers[idx] === q.correct ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'"
+                                              class="text-xs px-2.5 py-1 rounded-full border font-bold flex-shrink-0">
+                                            <span x-text="userAnswers[idx] === q.correct ? 'Correcta' : 'Incorrecta'"></span>
+                                        </span>
+                                    </div>
+
+                                    <div class="space-y-2 text-sm pl-2 border-l-2 border-slate-800 my-3">
+                                        <div class="text-slate-300">
+                                            <span class="text-slate-500">Tu respuesta:</span> 
+                                            <span class="font-medium" x-text="userAnswers[idx] !== undefined ? q.options[userAnswers[idx]] : 'Sin responder'"
+                                                  :class="userAnswers[idx] === q.correct ? 'text-emerald-400' : 'text-rose-400'"></span>
+                                        </div>
+                                        <div x-show="userAnswers[idx] !== q.correct" class="text-slate-300">
+                                            <span class="text-slate-500">Respuesta correcta:</span> 
+                                            <span class="font-medium text-emerald-400" x-text="q.options[q.correct]"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-3 p-3 bg-slate-900 rounded-lg text-xs text-slate-400 border border-slate-800">
+                                        <span class="font-bold text-slate-300">Explicación:</span> <span x-text="q.explanation"></span>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </section>
+
+
+        <!-- ================= MÓDULO 2: REPOSITORIO DE GUÍAS DE ESTUDIO ================= -->
+        <section x-show="activeTab === 'repository'" x-cloak class="space-y-6">
+            
+            <!-- Search & Filter Bar -->
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl flex flex-col md:flex-row gap-4 items-center justify-between">
+                <!-- Search Input -->
+                <div class="relative w-full md:w-96">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                    <input type="text" x-model="repoSearch" placeholder="Buscar por tema, palabra clave o código..."
+                           class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-11 pr-4 py-3 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-all">
+                </div>
+
+                <!-- Subject Filter Tabs -->
+                <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                    <button @click="repoFilterSubject = 'all'"
+                            :class="repoFilterSubject === 'all' ? 'bg-brand-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'"
+                            class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all">
+                        Todas
+                    </button>
+                    <template x-for="subj in subjects" :key="subj.id">
+                        <button @click="repoFilterSubject = subj.id"
+                                :class="repoFilterSubject === subj.id ? 'bg-brand-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'"
+                                class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center space-x-1.5">
+                            <i :class="subj.icon" class="text-xs"></i>
+                            <span x-text="subj.name"></span>
+                        </button>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Download Alert Toast -->
+            <div x-show="downloadToast.visible" x-cloak x-transition
+                 class="fixed bottom-6 right-6 z-50 bg-emerald-600 text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center space-x-3 border border-emerald-400">
+                <i class="fa-solid fa-circle-down text-xl"></i>
+                <div>
+                    <div class="font-bold text-sm">Descarga Iniciada</div>
+                    <div class="text-xs text-emerald-100" x-text="downloadToast.filename"></div>
+                </div>
+            </div>
+
+            <!-- Resource Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <template x-for="guide in filteredGuides" :key="guide.id">
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between hover:border-slate-700 transition-all hover:shadow-xl group">
+                        <div class="space-y-4">
+                            <!-- Card Header Info -->
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-1 bg-brand-500/10 border border-brand-500/20 text-brand-400 text-xs font-semibold rounded-lg uppercase tracking-wider"
+                                      x-text="getSubjectName(guide.subject)"></span>
+                                <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700/50"
+                                      x-text="guide.level"></span>
+                            </div>
+
+                            <!-- Title & Description -->
+                            <div>
+                                <h3 class="text-lg font-bold text-white group-hover:text-brand-400 transition-colors" x-text="guide.title"></h3>
+                                <p class="text-slate-400 text-sm mt-2 line-clamp-3 leading-relaxed" x-text="guide.description"></p>
+                            </div>
+                        </div>
+
+                        <!-- Card Footer & Meta -->
+                        <div class="pt-6 mt-6 border-t border-slate-800/80 flex items-center justify-between">
+                            <div class="text-xs text-slate-500 space-y-0.5">
+                                <div class="flex items-center space-x-1.5">
+                                    <i class="fa-regular fa-file-pdf text-rose-400"></i>
+                                    <span x-text="`${guide.format} • ${guide.size}`"></span>
+                                </div>
+                                <div x-text="`Páginas: ${guide.pages}`"></div>
+                            </div>
+
+                            <button @click="triggerDownload(guide.title, guide.format)"
+                                    class="px-4 py-2 bg-slate-800 hover:bg-brand-600 text-slate-200 hover:text-white rounded-xl text-xs font-semibold transition-all border border-slate-700 flex items-center space-x-2">
+                                <i class="fa-solid fa-download"></i>
+                                <span>Descargar</span>
+                            </button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Empty Filter State -->
+            <div x-show="filteredGuides.length === 0" class="text-center py-16 bg-slate-900 border border-slate-800 rounded-2xl">
+                <i class="fa-solid fa-folder-open text-5xl text-slate-700 mb-3"></i>
+                <h3 class="text-lg font-semibold text-slate-300">No se encontraron guías de estudio</h3>
+                <p class="text-sm text-slate-500 mt-1">Intenta ajustando los términos de búsqueda o los filtros seleccionados.</p>
+            </div>
+        </section>
+
+
+        <!-- ================= MÓDULO 3: PLANIFICADOR DE ESTUDIO (TO-DO) ================= -->
+        <section x-show="activeTab === 'planner'" x-cloak class="space-y-8">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Left: Add New Task Form -->
+                <div class="lg:col-span-1 bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-5 h-fit">
+                    <h3 class="text-xl font-bold text-white flex items-center space-x-2">
+                        <i class="fa-solid fa-plus-circle text-brand-500"></i>
+                        <span>Nueva Tarea de Repaso</span>
+                    </h3>
+
+                    <form @submit.prevent="addTask()" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Título de la Tarea</label>
+                            <input type="text" x-model="newTask.title" required placeholder="Ej: Repasar Algoritmos de Ordenamiento"
+                                   class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Asignatura</label>
+                            <select x-model="newTask.subject" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                                <template x-for="subj in subjects" :key="subj.id">
+                                    <option :value="subj.id" x-text="subj.name"></option>
+                                </template>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Fecha Límite</label>
+                            <input type="date" x-model="newTask.dueDate" required
+                                   class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-brand-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Prioridad</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button type="button" @click="newTask.priority = 'Alta'"
+                                        :class="newTask.priority === 'Alta' ? 'bg-rose-600 text-white border-rose-500' : 'bg-slate-950 text-slate-400 border-slate-800'"
+                                        class="py-2 text-xs font-semibold rounded-lg border transition-all">
+                                    Alta
+                                </button>
+                                <button type="button" @click="newTask.priority = 'Media'"
+                                        :class="newTask.priority === 'Media' ? 'bg-amber-600 text-white border-amber-500' : 'bg-slate-950 text-slate-400 border-slate-800'"
+                                        class="py-2 text-xs font-semibold rounded-lg border transition-all">
+                                    Media
+                                </button>
+                                <button type="button" @click="newTask.priority = 'Baja'"
+                                        :class="newTask.priority === 'Baja' ? 'bg-emerald-600 text-white border-emerald-500' : 'bg-slate-950 text-slate-400 border-slate-800'"
+                                        class="py-2 text-xs font-semibold rounded-lg border transition-all">
+                                    Baja
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit"
+                                class="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-xl shadow-lg transition-all text-sm flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Agregar al Planificador</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Right: Task List & Live Progress Bar -->
+                <div class="lg:col-span-2 space-y-6">
+                    
+                    <!-- Live Overall Progress Widget -->
+                    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="text-base font-bold text-white">Progreso General del Plan de Estudio</h4>
+                                <p class="text-xs text-slate-400" x-text="`${completedTasksCount} de ${tasks.length} tareas completadas`"></p>
+                            </div>
+                            <span class="text-2xl font-black text-brand-400" x-text="`${progressPercentage}%`"></span>
+                        </div>
+
+                        <div class="w-full bg-slate-950 h-3.5 rounded-full overflow-hidden p-0.5 border border-slate-800">
+                            <div class="bg-gradient-to-r from-brand-600 via-accent-500 to-emerald-400 h-full rounded-full transition-all duration-500"
+                                 :style="`width: ${progressPercentage}%`"></div>
+                        </div>
+                    </div>
+
+                    <!-- Tasks List -->
+                    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl space-y-4">
+                        <h4 class="text-lg font-bold text-white">Mis Tareas de Repaso</h4>
+
+                        <div class="space-y-3">
+                            <template x-for="task in tasks" :key="task.id">
+                                <div class="p-4 rounded-xl border bg-slate-950/70 flex items-center justify-between gap-4 transition-all"
+                                     :class="task.completed ? 'border-slate-800 opacity-60' : 'border-slate-800 hover:border-slate-700'">
+                                    
+                                    <div class="flex items-center space-x-3.5 flex-grow">
+                                        <button @click="toggleTask(task.id)" class="text-lg transition-colors">
+                                            <i class="fa-regular" :class="task.completed ? 'fa-square-check text-emerald-400 text-xl' : 'fa-square text-slate-500 hover:text-slate-300 text-xl'"></i>
+                                        </button>
+
+                                        <div class="space-y-1">
+                                            <div class="text-sm font-semibold text-slate-100" :class="{'line-through text-slate-500': task.completed}" x-text="task.title"></div>
+                                            <div class="flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                                                <span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300" x-text="getSubjectName(task.subject)"></span>
+                                                <span class="flex items-center space-x-1">
+                                                    <i class="fa-regular fa-calendar text-slate-500"></i>
+                                                    <span x-text="task.dueDate"></span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center space-x-3">
+                                        <span class="px-2.5 py-1 rounded-full text-xs font-bold border" :class="getPriorityClass(task.priority)" x-text="task.priority"></span>
+                                        <button @click="deleteTask(task.id)" class="p-2 text-slate-500 hover:text-rose-400 transition-colors">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <div x-show="tasks.length === 0" class="text-center py-10 text-slate-500">
+                                <i class="fa-solid fa-clipboard-check text-4xl mb-2 text-slate-700"></i>
+                                <p class="text-sm">No tienes tareas registradas en tu planificador.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto border-t border-slate-800/80 bg-slate-900 py-6 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 space-y-2">
+            <p class="font-semibold text-slate-400">ApexEdu Plataforma Educativa Digital &copy; 2026</p>
+            <p>Diseñado para potenciar el aprendizaje continuo e institucional.</p>
+        </div>
+    </footer>
+
+    <!-- Alpine App State & Logic -->
+    <script>
+        function apexEduApp() {
+            return {
+                activeTab: 'simulator', // 'simulator', 'repository', 'planner'
+                mobileMenuOpen: false,
+
+                // Materias Generales
+                subjects: [
+                    { id: 'info', name: 'Informática', icon: 'fa-solid fa-laptop-code' },
+                    { id: 'filo', name: 'Filosofía', icon: 'fa-solid fa-brain' },
+                    { id: 'quim', name: 'Química', icon: 'fa-solid fa-flask' },
+                    { id: 'mate', name: 'Matemáticas', icon: 'fa-solid fa-calculator' }
+                ],
+
+                getSubjectName(id) {
+                    const subj = this.subjects.find(s => s.id === id);
+                    return subj ? subj.name : id;
+                },
+
+                // ================= MÓDULO 1: SIMULADOR =================
+                quizState: 'setup', // 'setup', 'active', 'results'
+                quizConfig: {
+                    subject: 'info',
+                    mode: 'practice', // 'practice' or 'exam'
+                    timerMinutes: 10
+                },
+                activeQuestions: [],
+                currentQuestionIndex: 0,
+                userAnswers: {},
+                timerInterval: null,
+                timeLeftSeconds: 0,
+
+                // Banco de preguntas estructurado por materia
+                questionBank: {
+                    info: [
+                        {
+                            text: "¿Cuál es la función principal del procesador (CPU) en un sistema informático?",
+                            options: [
+                                "Almacenar archivos de manera permanente a largo plazo",
+                                "Ejecutar instrucciones de programas y procesar datos",
+                                "Proveer conectividad a redes locales e inalámbricas",
+                                "Gestionar la alimentación eléctrica de los periféricos"
+                            ],
+                            correct: 1,
+                            explanation: "La CPU (Unidad Central de Procesamiento) es el cerebro de la computadora, responsable de interpretar y ejecutar instrucciones."
+                        },
+                        {
+                            text: "¿Qué protocolo de red garantiza la transferencia segura de datos web mediante cifrado?",
+                            options: ["HTTP", "FTP", "HTTPS", "SMTP"],
+                            correct: 2,
+                            explanation: "HTTPS (Hypertext Transfer Protocol Secure) utiliza cifrado TLS/SSL para proteger la confidencialidad de la información transmitida."
+                        },
+                        {
+                            text: "¿Qué estructura de datos opera bajo el principio LIFO (Last In, First Out)?",
+                            options: ["Cola (Queue)", "Pila (Stack)", "Lista Enlazada", "Matriz Bidimensional"],
+                            correct: 1,
+                            explanation: "La Pila (Stack) inserta y extrae elementos por el mismo extremo, haciendo que el último elemento ingresado sea el primero en salir."
+                        },
+                        {
+                            text: "En programación orientada a objetos, ¿qué concepto permite a una clase derivar atributos y métodos de otra?",
+                            options: ["Encapsulamiento", "Polimorfismo", "Herencia", "Abstracción"],
+                            correct: 2,
+                            explanation: "La Herencia permite que una clase hija adquiera las propiedades y funcionalidades de una clase padre."
+                        }
+                    ],
+                    filo: [
+                        {
+                            text: "¿A qué filósofo griego se le atribuye la célebre frase 'Sólo sé que no sé nada' y el método de la Mayéutica?",
+                            options: ["Platón", "Aristóteles", "Sócrates", "Heráclito"],
+                            correct: 2,
+                            explanation: "Sócrates empleaba la mayéutica para guiar a sus interlocutores a descubrir la verdad mediante preguntas estructuradas."
+                        },
+                        {
+                            text: "¿Qué corriente filosófica afirma que el conocimiento proviene fundamentalmente de la experiencia sensorial?",
+                            options: ["Racionalismo", "Empirismo", "Idealismo", "Existencialismo"],
+                            correct: 1,
+                            explanation: "El Empirismo (defendido por Locke, Hume) sostiene que la mente es una 'tabla rasa' que se llena mediante la experiencia."
+                        },
+                        {
+                            text: "¿Quién propuso el concepto del 'Imperativo Categórico' como fundamento de la ética del deber?",
+                            options: ["Immanuel Kant", "Friedrich Nietzsche", "René Descartes", "Jean-Paul Sartre"],
+                            correct: 0,
+                            explanation: "Kant planteó el Imperativo Categórico como una regla moral universal aplicable a todas las acciones racionales."
+                        },
+                        {
+                            text: "¿Qué obra célebre escrita por Platón expone la Alegoría del Mito de la Caverna?",
+                            options: ["Ética a Nicómaco", "La República", "Metafísica", "El Discurso del Método"],
+                            correct: 1,
+                            explanation: "En 'La República', Platón describe la alegoría de la caverna para ilustrar la teoría de las Ideas y el conocimiento."
+                        }
+                    ],
+                    quim: [
+                        {
+                            text: "¿Cuál es la partícula subatómica con carga eléctrica negativa localizada en los orbitales del átomo?",
+                            options: ["Protón", "Neutrón", "Electrón", "Positrón"],
+                            correct: 2,
+                            explanation: "Los electrones orbitan el núcleo atómico y poseen carga eléctrica negativa de igual magnitud que el protón."
+                        },
+                        {
+                            text: "¿Qué valor de pH en una solución acuosa indica un carácter totalmente neutro a 25 °C?",
+                            options: ["pH = 0", "pH = 7", "pH = 14", "pH = 1"],
+                            correct: 1,
+                            explanation: "Un valor de pH igual a 7 indica neutralidad exacta en la escala logarítmica de concentración de protones."
+                        },
+                        {
+                            text: "¿Qué tipo de enlace químico se forma mediante la transferencia completa de electrones entre un metal y un no metal?",
+                            options: ["Enlace Covalente Polar", "Enlace Covalente Apolar", "Enlace Iónico", "Enlace Metálico"],
+                            correct: 2,
+                            explanation: "El enlace iónico resulta de la atracción electrostática entre cationes y aniones generados por transferencia de electrones."
+                        },
+                        {
+                            text: "¿Cómo se denomina el cambio directo de estado de una sustancia desde sólido a gaseoso sin pasar por líquido?",
+                            options: ["Evaporación", "Sublimación", "Condensación", "Fusión"],
+                            correct: 1,
+                            explanation: "La sublimación es la transición directa del estado sólido al gaseoso bajo condiciones de presión y temperatura específicas."
+                        }
+                    ],
+                    mate: [
+                        {
+                            text: "¿Cuál es la derivada de la función f(x) = x³ + 4x - 5 con respecto a x?",
+                            options: ["3x² + 4", "3x² + 4x", "x² + 4", "3x³ + 4"],
+                            correct: 0,
+                            explanation: "Aplicando la regla de la potencia: d/dx(x³) = 3x², d/dx(4x) = 4 y la constante -5 se elimina."
+                        },
+                        {
+                            text: "En un triángulo rectángulo, si los catetos miden 3 cm y 4 cm, ¿cuál es la longitud de la hipotenusa?",
+                            options: ["5 cm", "6 cm", "7 cm", "25 cm"],
+                            correct: 0,
+                            explanation: "Según el Teorema de Pitágoras: c = √(3² + 4²) = √(9 + 16) = √25 = 5 cm."
+                        },
+                        {
+                            text: "¿A qué equivale log₁₀(1000)?",
+                            options: ["10", "100", "3", "1"],
+                            correct: 2,
+                            explanation: "El logaritmo base 10 de 1000 es 3 porque 10 elevado a la potencia 3 equivale a 1000."
+                        },
+                        {
+                            text: "¿Cuál es el resultado de la integral indefinida ∫ 2x dx?",
+                            options: ["2x² + C", "x² + C", "x + C", "2 + C"],
+                            correct: 1,
+                            explanation: "La antiderivada de 2x es 2*(x²/2) + C = x² + C."
+                        }
+                    ]
+                },
+
+                get currentQuestion() {
+                    return this.activeQuestions[this.currentQuestionIndex] || {};
+                },
+
+                startQuiz() {
+                    this.activeQuestions = this.questionBank[this.quizConfig.subject] || [];
+                    this.currentQuestionIndex = 0;
+                    this.userAnswers = {};
+                    this.quizState = 'active';
+
+                    if (this.quizConfig.mode === 'exam') {
+                        this.timeLeftSeconds = this.quizConfig.timerMinutes * 60;
+                        if (this.timerInterval) clearInterval(this.timerInterval);
+                        this.timerInterval = setInterval(() => {
+                            if (this.timeLeftSeconds > 0) {
+                                this.timeLeftSeconds--;
+                            } else {
+                                this.finishQuiz();
+                            }
+                        }, 1000);
+                    }
+                },
+
+                get formattedTimeLeft() {
+                    const mins = Math.floor(this.timeLeftSeconds / 60);
+                    const secs = this.timeLeftSeconds % 60;
+                    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                },
+
+                selectOption(index) {
+                    this.userAnswers[this.currentQuestionIndex] = index;
+                },
+
+                getOptionClass(idx) {
+                    const isSelected = this.userAnswers[this.currentQuestionIndex] === idx;
+                    if (this.quizConfig.mode === 'practice' && this.userAnswers[this.currentQuestionIndex] !== undefined) {
+                        if (idx === this.currentQuestion.correct) {
+                            return 'bg-emerald-500/20 border-emerald-500 text-emerald-200';
+                        }
+                        if (isSelected && idx !== this.currentQuestion.correct) {
+                            return 'bg-rose-500/20 border-rose-500 text-rose-200';
+                        }
+                    }
+                    if (isSelected) {
+                        return 'bg-brand-600/30 border-brand-500 text-white font-medium';
+                    }
+                    return 'bg-slate-950/60 border-slate-800 text-slate-300 hover:bg-slate-800';
+                },
+
+                prevQuestion() {
+                    if (this.currentQuestionIndex > 0) this.currentQuestionIndex--;
+                },
+
+                nextQuestion() {
+                    if (this.currentQuestionIndex < this.activeQuestions.length - 1) this.currentQuestionIndex++;
+                },
+
+                finishQuiz() {
+                    if (this.timerInterval) clearInterval(this.timerInterval);
+                    this.quizState = 'results';
+                },
+
+                resetQuiz() {
+                    this.quizState = 'setup';
+                    if (this.timerInterval) clearInterval(this.timerInterval);
+                },
+
+                get correctCount() {
+                    let correct = 0;
+                    this.activeQuestions.forEach((q, idx) => {
+                        if (this.userAnswers[idx] === q.correct) correct++;
+                    });
+                    return correct;
+                },
+
+                get incorrectCount() {
+                    return this.activeQuestions.length - this.correctCount;
+                },
+
+                get calculatedScore() {
+                    if (this.activeQuestions.length === 0) return 0;
+                    return (this.correctCount / this.activeQuestions.length) * 10;
+                },
+
+
+                // ================= MÓDULO 2: REPOSITORIO =================
+                repoSearch: '',
+                repoFilterSubject: 'all',
+                downloadToast: { visible: false, filename: '' },
+
+                guides: [
+                    {
+                        id: 1,
+                        subject: 'info',
+                        title: 'Fundamentos de Algoritmos y Diagramación',
+                        description: 'Guía introductoria a las estructuras de control lógico, pseudocódigo y resolución sistemática de problemas.',
+                        level: 'Nivel Básico',
+                        format: 'PDF',
+                        size: '2.4 MB',
+                        pages: 18
+                    },
+                    {
+                        id: 2,
+                        subject: 'info',
+                        title: 'Arquitectura de Computadores e Interfaces',
+                        description: 'Análisis del funcionamiento de la CPU, buses de datos, memoria RAM y microarquitecturas modernas.',
+                        level: 'Nivel Avanzado',
+                        format: 'PDF',
+                        size: '4.1 MB',
+                        pages: 35
+                    },
+                    {
+                        id: 3,
+                        subject: 'filo',
+                        title: 'Compendio de Filosofía Griega Clásica',
+                        description: 'Estudio de los presupuestos socráticos, platónicos y aristotélicos y su impacto en la ontología occidental.',
+                        level: 'Nivel Intermedio',
+                        format: 'PDF',
+                        size: '1.8 MB',
+                        pages: 24
+                    },
+                    {
+                        id: 4,
+                        subject: 'filo',
+                        title: 'Ética Kantiana y Moral Contemporánea',
+                        description: 'Desglose crítico sobre la fundamentación de la metafísica de las costumbres y deontología.',
+                        level: 'Nivel Avanzado',
+                        format: 'PDF',
+                        size: '3.0 MB',
+                        pages: 29
+                    },
+                    {
+                        id: 5,
+                        subject: 'quim',
+                        title: 'Manual de Estequiometría y Reacciones',
+                        description: 'Ejercicios resueltos sobre balanceo de ecuaciones químicas, ley de conservación de masa y reactivo limitante.',
+                        level: 'Nivel Intermedio',
+                        format: 'PDF',
+                        size: '3.5 MB',
+                        pages: 30
+                    },
+                    {
+                        id: 6,
+                        subject: 'mate',
+                        title: 'Cálculo Diferencial e Integral',
+                        description: 'Guía de ejercitación teórica y práctica sobre derivadas, integrales y aplicaciones de tasa de cambio.',
+                        level: 'Nivel Avanzado',
+                        format: 'PDF',
+                        size: '5.2 MB',
+                        pages: 42
+                    }
+                ],
+
+                get filteredGuides() {
+                    return this.guides.filter(g => {
+                        const matchesSubject = this.repoFilterSubject === 'all' || g.subject === this.repoFilterSubject;
+                        const matchesSearch = g.title.toLowerCase().includes(this.repoSearch.toLowerCase()) ||
+                                              g.description.toLowerCase().includes(this.repoSearch.toLowerCase());
+                        return matchesSubject && matchesSearch;
+                    });
+                },
+
+                triggerDownload(title, format) {
+                    this.downloadToast.filename = `${title}.${format.toLowerCase()}`;
+                    this.downloadToast.visible = true;
+                    setTimeout(() => {
+                        this.downloadToast.visible = false;
+                    }, 3500);
+                },
+
+
+                // ================= MÓDULO 3: PLANIFICADOR (TO-DO) =================
+                tasks: [],
+                newTask: {
+                    title: '',
+                    subject: 'info',
+                    dueDate: new Date().toISOString().split('T')[0],
+                    priority: 'Media'
+                },
+
+                get completedTasksCount() {
+                    return this.tasks.filter(t => t.completed).length;
+                },
+
+                get progressPercentage() {
+                    if (this.tasks.length === 0) return 0;
+                    return Math.round((this.completedTasksCount / this.tasks.length) * 100);
+                },
+
+                addTask() {
+                    if (!this.newTask.title.trim()) return;
+                    this.tasks.push({
+                        id: Date.now(),
+                        title: this.newTask.title.trim(),
+                        subject: this.newTask.subject,
+                        dueDate: this.newTask.dueDate,
+                        priority: this.newTask.priority,
+                        completed: false
+                    });
+                    this.newTask.title = '';
+                    this.saveTasks();
+                },
+
+                toggleTask(id) {
+                    const task = this.tasks.find(t => t.id === id);
+                    if (task) {
+                        task.completed = !task.completed;
+                        this.saveTasks();
+                    }
+                },
+
+                deleteTask(id) {
+                    this.tasks = this.tasks.filter(t => t.id !== id);
+                    this.saveTasks();
+                },
+
+                getPriorityClass(priority) {
+                    switch (priority) {
+                        case 'Alta': return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+                        case 'Media': return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+                        case 'Baja': return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+                        default: return 'bg-slate-800 text-slate-400 border-slate-700';
+                    }
+                },
+
+                saveTasks() {
+                    localStorage.setItem('apexedu_tasks', JSON.stringify(this.tasks));
+                },
+
+                loadTasks() {
+                    const saved = localStorage.getItem('apexedu_tasks');
+                    if (saved) {
+                        try {
+                            this.tasks = JSON.parse(saved);
+                        } catch(e) {
+                            this.tasks = [];
+                        }
+                    } else {
+                         // Default initial mock tasks
+                        this.tasks = [
+                            { id: 1, title: 'Repaso de mayéutica y Sócrates', subject: 'filo', dueDate: '2026-10-20', priority: 'Alta', completed: false },
+                            { id: 2, title: 'Ejercicios de derivación de funciones', subject: 'mate', dueDate: '2026-10-22', priority: 'Media', completed: true },
+                            { id: 3, title: 'Revisión de guía de estequiometría', subject: 'quim', dueDate: '2026-10-25', priority: 'Baja', completed: false }
+                        ];
+                        this.saveTasks();
+                    }
+                },
+
+                initApp() {
+                    this.loadTasks();
+                }
+            }
+        }
+    </script>
+</body>
+</html>
